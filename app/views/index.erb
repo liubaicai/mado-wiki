@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />
+  <title><%= config['site_title'] %></title>
+  <link rel="icon" href="/favicon.ico" mce_href="/favicon.ico" type="image/x-icon">
+  <link href="/css/github.min.css" rel="stylesheet">
+  <link href="/css/bootstrap.min.css" rel="stylesheet">
+  <script src="/js/highlight.min.js"></script>
+  <script src="/js/jquery.min.js"></script>
+  <script src="/js/bootstrap.min.js"></script>
+  <script>
+      document.addEventListener('DOMContentLoaded', (event) => {
+          document.querySelectorAll('pre code').forEach((block) => {
+              hljs.highlightBlock(block)
+          })
+      })
+  </script>
+  <script type="text/javascript">
+      $(document).ready(function() {
+          $("h1,h2,h3,h4,h5,h6").each(function(i, item) {
+              const title = $(item).get(0).textContent
+              const tag = $(item).get(0).localName
+              $(item).attr('id', 'toc' + i + '-' + title)
+              $("#toc").append('<li class="list-group-item list-group-item-success"><a class="new' + tag + '" href="#' + 'toc' + i + '-' + title + '">' + $(this).text() + '</a></li>')
+              $(".newh1").css("margin-left", 0)
+              $(".newh2").css("margin-left", 10)
+              $(".newh3").css("margin-left", 20)
+              $(".newh4").css("margin-left", 30)
+              $(".newh5").css("margin-left", 45)
+              $(".newh6").css("margin-left", 60)
+          });
+          $("li.list-caret-close").click(function(){
+              if($(this).hasClass('list-caret-open'))
+              {
+                  $(this).removeClass("list-caret-open");
+              } else{
+                  $(this).addClass("list-caret-open");
+              }
+          });
+          $("table").css("width", "100%");
+          $("table").addClass("table table-striped");
+      });
+  </script>
+  <style>
+    .container-fluid {
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+    .list-group-item {
+      padding: 5px 7px;
+    }
+    .list-group-item-success a {
+      color: #666666;
+    }
+    .top {
+        /*position: fixed;*/
+        /*top: 0px;*/
+    }
+    .bottom {
+        position: fixed;
+        bottom: 0px;
+    }
+    .catalog-child {
+        padding-left: 20px;
+    }
+    li.list-caret-close span.caret{
+      -webkit-transform: rotate(270deg);
+      -moz-transform: rotate(270deg);
+      transform: rotate(270deg);
+    }
+    li.list-caret-open span.caret{
+      -webkit-transform: rotate(0deg);
+      -moz-transform: rotate(0deg);
+      transform: rotate(0deg);
+    }
+  </style>
+</head>
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8 col-md-push-2" id="content"><%= contents %></div>
+    <div class="col-md-2 col-md-push-2">
+      <ul class="list-group top" id="toc">
+
+      </ul>
+      <ul class="list-group">
+        <a href="#" style="z-index: 9;" class="list-group-item bottom">回到顶部</a>
+      </ul>
+    </div>
+    <div class="col-md-2 col-md-pull-10" onselectstart="return false">
+      <div class="text-muted">
+        <p onclick="location='/'" class="h2"><%= config['site_title'] %></p>
+      </div>
+      <ul class="list-group">
+        <% catalogs.each do |file| %>
+          <% if file[:child].nil? %>
+            <a href="<%= file[:path] %>" class="list-group-item list-group-item-warning <% if current==file[:path] %>active<% end %>"><%= file[:name] %></a>
+          <% else %>
+            <li class="list-caret-close list-group-item list-group-item-info <% if current_p==file[:path] %>list-caret-open<% end %>" onclick="$('.<%= file[:name] %>').toggle()">
+              <span class="caret"></span>
+              <span class="badge"><%= file[:child].size %></span>
+              <%= file[:name] %>
+            </li>
+            <% file[:child].each do |c_file| %>
+              <a href="<%= c_file[:path] %>" style="<% unless current_p==file[:path] %>display:none;<% end %>"
+                 class="list-group-item list-group-item-warning <% if current==c_file[:path] %>active<% end %> catalog-child <%= file[:name] %>">
+                <%= c_file[:name] %>
+              </a>
+            <% end %>
+          <% end %>
+        <% end %>
+      </ul>
+    </div>
+  </div>
+</div>
+</body>
+</html>
